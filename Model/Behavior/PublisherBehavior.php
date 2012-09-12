@@ -47,7 +47,7 @@ class PublisherBehavior extends ModelBehavior {
 		if(!$this->ChannelModel->PsChannelsEvent->save(
 			array(
 				'PsChannelsEvent' => array(
-					'ps_channel_id' => $currentChannelID,
+					'ps_channel_id' => $currentChannel['PsChannel']['id'],
 					'ps_event_id' => $eventID
 				)
 			)
@@ -55,7 +55,7 @@ class PublisherBehavior extends ModelBehavior {
 			throw new CakeException('Unable to save association between Channel and Event');
 		}
 
-		$Model->getEventManager()->dispatch(new CakeEvent('PubSub.PublisherBehavior.afterPublished', $Model, array($currentChannelID, $eventID)));
+		$Model->getEventManager()->dispatch(new CakeEvent('PubSub.PublisherBehavior.afterPublished', $Model, array($currentChannel, $event)));
 	}
 
 	protected function _channelRoutine(Model $Model, $channelName, $channelType) {
