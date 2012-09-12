@@ -19,6 +19,10 @@ class PublisherBehavior extends ModelBehavior {
 	    /* Instantiate needed models */
 	    $this->ChannelModel = ClassRegistry::init('PubSub.PsChannel');
 	    $this->EventModel = ClassRegistry::init('PubSub.PsEvent');
+
+	    App::uses('PusherBehavior', 'Pusher.Model/Behavior');
+	    if(!class_exists('PusherBehavior'))
+	    	throw new MissingPluginException('Missing Pusher plugin');
 	}
 
 	public function publish(Model $Model, $channelName, $eventName, $eventData, $channelType = null) {
