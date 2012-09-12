@@ -21,7 +21,7 @@ class PublisherBehavior extends ModelBehavior {
 	    $this->EventModel = ClassRegistry::init('PubSub.PsEvent');
 	}
 
-	public function publish(Model $Model, $channelName, $eventName, $channelType = null) {
+	public function publish(Model $Model, $channelName, $eventName, $eventData, $channelType = null) {
 		if(!$Model->id)
 			throw new CakeException('No entity initialized for model ' . $Model->alias);
 
@@ -31,6 +31,7 @@ class PublisherBehavior extends ModelBehavior {
 			'PsEvent' => array(
 				'id' => $eventID,
 				'name' => $eventName,
+				'data' => json_encode($eventData),
 				'model' => $Model->alias,
 				'foreign_key' => $Model->id
 			)
