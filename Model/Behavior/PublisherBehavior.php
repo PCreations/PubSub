@@ -78,10 +78,6 @@ class PublisherBehavior extends ModelBehavior {
 		}
 		return $this->ChannelModel->findByName($channelName);
 	}
-
-	protected function _eventRoutine(Model $Model, $eventName) {
-
-	}
 }
 
 ?>

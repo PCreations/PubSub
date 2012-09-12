@@ -7,6 +7,8 @@ App::uses('PubSubAppModel', 'PubSub.Model');
  */
 class PsSubscribe extends PubSubAppModel {
 
+	public $actsAs = array('Containable');
+
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
@@ -23,4 +25,5 @@ class PsSubscribe extends PubSubAppModel {
 			'order' => ''
 		)
 	);
+
 }

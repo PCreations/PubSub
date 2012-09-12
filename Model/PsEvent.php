@@ -6,6 +6,9 @@ App::uses('PubSubAppModel', 'PubSub.Model');
  * @property PsChannel $PsChannel
  */
 class PsEvent extends PubSubAppModel {
+
+	public $actsAs = array('Containable');
+	
 /**
  * Display field
  *
