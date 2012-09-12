@@ -16,13 +16,14 @@ class PublisherBehavior extends ModelBehavior {
 	    }
 	    $this->settings[$Model->alias] = array_merge($this->settings[$Model->alias], (array)$settings);
 
-	    /* Instantiate needed models */
 	    $this->ChannelModel = ClassRegistry::init('PubSub.PsChannel');
 	    $this->EventModel = ClassRegistry::init('PubSub.PsEvent');
 
 	    App::uses('PusherBehavior', 'Pusher.Model/Behavior');
 	    if(!class_exists('PusherBehavior'))
 	    	throw new MissingPluginException('Missing Pusher plugin');
+
+	    $Model->Behaviors->load('Pusher.Pusher');
 	}
 
 	public function publish(Model $Model, $channelName, $eventName, $eventData, $channelType = null) {
@@ -59,6 +60,9 @@ class PublisherBehavior extends ModelBehavior {
 			throw new CakeException('Unable to save association between Channel and Event');
 		}
 
+		/* Trigger event on Pusher */
+		$Model->triggerPrivate($channelName, $eventName, $eventData);
+		
 		$Model->getEventManager()->dispatch(new CakeEvent('PubSub.PublisherBehavior.afterPublished', $Model, array($currentChannel, $event)));
 	}
 
