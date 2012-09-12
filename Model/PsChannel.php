@@ -62,4 +62,12 @@ class PsChannel extends PubSubAppModel {
 		)
 	);
 
+	public function channelExists($channelName) {
+		$result = $this->find('first', array(
+			'conditions' => array(
+				'PsChannel.name' => $channelName,
+			)
+		));
+		return !empty($result);
+	}
 }
