@@ -17,6 +17,31 @@ class SubscriberBehavior extends ModelBehavior {
 	    /* Instantiate needed models */
 	    $this->ChannelModel = ClassRegistry::init('PubSub.PsChannel');
 	    $this->SubscribeModel = ClassRegistry::init('PubSub.PsSubscribe');
+
+	    /* Bind model */
+	    $Model->bindModel(
+			array(
+				'hasMany' => array(
+					'PsSubscribe' => array(
+						'className' => 'PsSubscribe',
+						'foreignKey' => 'foreign_key',
+						'dependent' => false,
+						'conditions' => array(
+							'PsSubscribe.model' => $Model->alias,
+							'PsSubscribe.foreign_key' => $Model->id
+						),
+						'fields' => '',
+						'order' => '',
+						'limit' => '',
+						'offset' => '',
+						'exclusive' => '',
+						'finderQuery' => '',
+						'counterQuery' => ''
+					)
+				)
+			),
+			false
+		);
 	}
 
 	public function subscribe(Model $Model, $channelName) {
@@ -42,43 +67,6 @@ class SubscriberBehavior extends ModelBehavior {
 		}
 
 		$Model->getEventManager()->dispatch(new CakeEvent('PubSub.SubscriberBehavior.afterSubscribed', $Model, array($subscription)));
-	}
-
-	public function findSubscriptions($Model, $options = array()) {
-		$Model->bindModel(
-			array(
-				'hasMany' => array(
-					'PsSubscribe' => array(
-						'className' => 'PsSubscribe',
-						'foreignKey' => 'foreign_key',
-						'dependent' => false,
-						'conditions' => array(
-							'PsSubscribe.model' => $Model->alias,
-							'PsSubscribe.foreign_key' => $Model->id
-						),
-						'fields' => '',
-						'order' => '',
-						'limit' => '',
-						'offset' => '',
-						'exclusive' => '',
-						'finderQuery' => '',
-						'counterQuery' => ''
-					)
-				)
-			),
-			false
-		);
-
-		$options['conditions'][$Model->alias . '.' . $Model->primaryKey] = $Model->id;
-		$options['contain']['PsSubscribe'] = array(
-			'fields' => array(
-				'PsSubscribe.ps_channel_id',
-				'PsSubscribe.created'
-			),
-			'PsChannel.name'
-		);
-
-		return $Model->find('all', $options);
 	}
 }
 

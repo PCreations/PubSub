@@ -7,8 +7,7 @@ App::uses('PubSubAppModel', 'PubSub.Model');
  */
 class PsEvent extends PubSubAppModel {
 
-	public $actsAs = array('Containable');
-	
+
 /**
  * Display field
  *
