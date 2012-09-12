@@ -58,14 +58,14 @@ class PublisherBehavior extends ModelBehavior {
 		$Model->getEventManager()->dispatch(new CakeEvent('PubSub.PublisherBehavior.afterPublished', $Model, array($currentChannelID, $eventID)));
 	}
 
-	protected function _channelRoutine(Model $Model, $channelName) {
+	protected function _channelRoutine(Model $Model, $channelName, $channelType) {
 		$channelExists = $this->ChannelModel->channelExists($channelName);
 		$channelID = String::uuid();
 		if(!$channelExists) {
 			if($this->ChannelModel->save(array(
 				'PsChannel' => array(
 					'id' => $channelID,
-					'name' => $channelName
+					'name' => $channelName,
 					'type' => $channelType,
 				)
 			))){
