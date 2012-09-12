@@ -6,6 +6,8 @@ class PublisherBehavior extends ModelBehavior {
 
 	protected $ChannelModel;
 
+	protected $EventModel;
+
 	public function setup(Model $Model, $settings = array()) {
 	    if (!isset($this->settings[$Model->alias])) {
 	        $this->settings[$Model->alias] = array(
@@ -16,6 +18,7 @@ class PublisherBehavior extends ModelBehavior {
 
 	    /* Instantiate needed models */
 	    $this->ChannelModel = ClassRegistry::init('PubSub.PsChannel');
+	    $this->EventModel = ClassRegistry::init('PubSub.PsEvent');
 	}
 
 	public function publish(Model $Model, $channelName, $eventName, $channelType = null) {
@@ -23,20 +26,38 @@ class PublisherBehavior extends ModelBehavior {
 			throw new CakeException('No entity initialized for model ' . $Model->alias);
 
 		$channelType = ($channelType == null) ? $this->settings[$Model->alias]['channelType'] : $channelType;
+		$eventID = String::uuid();
 		$event = array(
 			'PsEvent' => array(
-				'id' => String::uuid(),
+				'id' => $eventID,
 				'name' => $eventName,
 				'model' => $Model->alias,
 				'foreign_key' => $Model->id
 			)
 		);
 
+		if(!$this->EventModel->save($event)) {
+			throw new CakeException('Unable to save Event');
+		}
+
 		$currentChannel = $this->_channelRoutine($Model, $channelName, $channelType);
-		
+
+		/* Save association */
+		if(!$this->ChannelModel->PsChannelsEvent->save(
+			array(
+				'PsChannelsEvent' => array(
+					'ps_channel_id' => $currentChannelID,
+					'ps_event_id' => $eventID
+				)
+			)
+		)) {
+			throw new CakeException('Unable to save association between Channel and Event');
+		}
+
+		$Model->getEventManager()->dispatch(new CakeEvent('PubSub.PublisherBehavior.afterPublished', $Model, array($currentChannelID, $eventID)));
 	}
 
-	protected function _channelRoutine(Model $model, $channelName) {
+	protected function _channelRoutine(Model $Model, $channelName) {
 		$channelExists = $this->ChannelModel->channelExists($channelName);
 		$channelID = String::uuid();
 		if(!$channelExists) {
@@ -55,6 +76,10 @@ class PublisherBehavior extends ModelBehavior {
 			}
 		}
 		return $this->Channel->findByName($channelName);
+	}
+
+	protected function _eventRoutine(Model $Model, $eventName) {
+
 	}
 }
 
