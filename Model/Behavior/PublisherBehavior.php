@@ -76,7 +76,7 @@ class PublisherBehavior extends ModelBehavior {
 				throw new CakeException('Unable to save Channel');
 			}
 		}
-		return $this->Channel->findByName($channelName);
+		return $this->ChannelModel->findByName($channelName);
 	}
 
 	protected function _eventRoutine(Model $Model, $eventName) {
